@@ -1,0 +1,69 @@
+
+name: CI - Build and Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+      - develop
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Display trigger information
+      - name: Workflow information
+        run: |
+          echo "CI Pipeline Started"
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+
+      # Step 3: Build application
+      - name: Build application
+        run: |
+          echo "Configure your build command here"
+          # Example:
+          # make build
+
+      # Step 4: Run unit tests
+      - name: Run unit tests
+        run: |
+          echo "Configure your test command here"
+          # Example:
+          # make test
+
+      # Step 5: CI completed
+      - name: CI Pipeline Summary
+        if: success()
+        run: echo "Build and tests completed successfully!"
+
+      # Step 6: Failure notification in logs
+      - name: CI Pipeline Failed
+        if: failure()
+        run: echo "Build or tests failed. Check previous steps."
